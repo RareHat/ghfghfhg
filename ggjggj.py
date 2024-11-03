@@ -1,5 +1,5 @@
 import os
-from PIL import Image, ImageFilter
+from PIL import Image, ImageFilter, ImageEnhance
 from PyQt6.QtGui import QImage, QPixmap
 from PyQt6.QtWidgets import *
 
@@ -15,7 +15,7 @@ def pil2pixmap(im):
         im = im.convert("RGBA")
     im2 = im.convert("RGBA")
     data = im2.tobytes("raw", "RGBA")
-    qim = QImage(data, im.size[0], im.size[1], QImage.Format_ARGB32)
+    qim = QImage(data, im.size[0], im.size[1], QImage.Format.Format_ARGB32)
     pixmap = QPixmap.fromImage(qim)
     return pixmap
 
@@ -32,7 +32,7 @@ class PhotoManager:
     def load(self):
         image_path = os.path.join(self.folder, self.filename)
         self.photo = Image.open(image_path)
-    def show_show(self,image_lbl):
+    def show_image(self,image_lbl):
         pixels = pil2pixmap(self.photo)
         pixels = pixels.scaledToWidth(500)
         image_lbl.setPixmap(pixels)
@@ -43,31 +43,31 @@ class PhotoManager:
         self.show_image(self.image_lbl)
 
     def sharp(self):
-        self.photo = self.filter(ImageFilter.SHARPEN)
+        self.photo = self.photo.filter(ImageFilter.SHARPEN)
         self.show_image(self.image_lbl)
 
-    def right(self):
-        self.photo = self.photo.transpose(Image.ROTATE_90)
+    def color(self):
+        self.photo = ImageEnhance.Color(self.photo).enhance(1.5)
         self.show_image(self.image_lbl)
 
     def kontur(self):
-        self.photo = self.filter(ImageFilter.CONTOUR)
+        self.photo = self.photo.filter(ImageFilter.CONTOUR)
         self.show_image(self.image_lbl)
 
     def flip(self):
-        self.photo = self.transpose(Image.FLIP_LEFT_RIGHT)
+        self.photo = self.photo.transpose(Image.FLIP_LEFT_RIGHT)
         self.show_image(self.image_lbl)
 
     def Edge(self):
-        self.photo = self.filter(ImageFilter.EDGE_ENHANCE)
+        self.photo = self.photo.filter(ImageFilter.EDGE_ENHANCE)
         self.show_image(self.image_lbl)
 
     def Bright(self):
-        self.photo = self.ImageEnhance.Brightness(image_lbl).enhance(1.5)
+        self.photo = ImageEnhance.Brightness(self.photo).enhance(1.5)
         self.show_image(self.image_lbl)
 
     def blur(self):
-        self.photo = self.ImageEnhance.Brightness().enhance(1.5)
+        self.photo = ImageEnhance.Brightness(self.photo).enhance(1.5)
         self.show_image(self.image_lbl)
 
 
@@ -80,7 +80,7 @@ menu_btn = QPushButton("Меню")
 
 line_lbl = QLabel("Картинка")
 list_widg = QListWidget()
-button_btn = QPushButton("Яскравість 50%")
+button_btn = QPushButton("Насиченість 50%")
 button2_btn = QPushButton("Розмивання")
 button3_btn = QPushButton("Дзеркало")
 button4_btn = QPushButton("Яскравість 50%")
@@ -108,6 +108,14 @@ v2.addWidget(button4_btn)
 v2.addWidget(button5_btn)
 v3.addLayout(v2)
 
+v4 = QHBoxLayout()
+v4.addWidget(button_btn)
+v4.addWidget(button7_btn)
+v4.addWidget(button6_btn)
+v4.addWidget(button8_btn)
+v3.addLayout(v4)
+
+
 photo_manager = PhotoManager()
 photo_manager.image_lbl = line_lbl
 
@@ -127,13 +135,13 @@ list_widg.currentRowChanged.connect(show_chosen_image)
 
 buttonv2_btn.clicked.connect(open_folder)
 button5_btn.clicked.connect(photo_manager.bw)
-button7_btn.clicked.connect(photo_manager.sharp())
+button7_btn.clicked.connect(photo_manager.sharp)
 button8_btn.clicked.connect(photo_manager.Edge)
-button4_btn.clicked.connect(photo_manager.Bright())
-button5_btn.clicked.connect(photo_manager.blur())
+button4_btn.clicked.connect(photo_manager.Bright)
+button2_btn.clicked.connect(photo_manager.blur)
 button3_btn.clicked.connect(photo_manager.flip)
 button6_btn.clicked.connect(photo_manager.kontur)
-button5_btn.clicked.connect(photo_manager.right)
+button_btn.clicked.connect(photo_manager.color)
 
 main_line.addLayout(v3)
 
